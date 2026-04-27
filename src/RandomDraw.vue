@@ -11,10 +11,34 @@ const lottery = reactive({
   isWinner: false,
   showEdit: false,
   excludeWinners: true,
-  drawCount: 1
+  drawCount: 1,
+  useRange: false,     // 是否使用數字範圍模式
+  rangeStart: 1,       // 範圍起始
+  rangeEnd: 30,        // 範圍結束
+  excludeInput: ""     // 排除號碼輸入 (字串)
 });
 
 let rollInterval = null;
+
+// 解析排除號碼字串 (例如 "4, 17-20")
+const parseExclusions = (input) => {
+  const excluded = new Set();
+  if (!input) return excluded;
+  input.split(',').forEach(part => {
+    const range = part.trim().split('-');
+    if (range.length === 2) {
+      const start = parseInt(range[0]);
+      const end = parseInt(range[1]);
+      if (!isNaN(start) && !isNaN(end)) {
+        for (let i = Math.min(start, end); i <= Math.max(start, end); i++) excluded.add(i);
+      }
+    } else {
+      const num = parseInt(part.trim());
+      if (!isNaN(num)) excluded.add(num);
+    }
+  });
+  return excluded;
+};
 
 // 音效初始化
 const rollSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
@@ -22,7 +46,17 @@ const winSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/201
 rollSound.volume = 0.3;
 
 const resetLottery = () => {
-  lottery.pool = lottery.rawInput.split('\n').map(s => s.trim()).filter(n => n);
+  if (lottery.useRange) {
+    const excluded = parseExclusions(lottery.excludeInput);
+    const newPool = [];
+    for (let i = lottery.rangeStart; i <= lottery.rangeEnd; i++) {
+      if (!excluded.has(i)) newPool.push(i.toString());
+    }
+    lottery.pool = newPool;
+  } else {
+    lottery.pool = lottery.rawInput.split('\n').map(s => s.trim()).filter(n => n);
+  }
+
   lottery.history = [];
   lottery.winners = [];
   lottery.display = "名單已重載 (" + lottery.pool.length + ")";
@@ -109,6 +143,22 @@ resetLottery();
       
       <div class="action-flex">
         <div class="toggle-container">
+          <span>抽籤模式：</span>
+          <div class="toggle-switch" :class="{ on: lottery.useRange }" @click="lottery.useRange = !lottery.useRange; resetLottery();"></div>
+          <span class="pool-text" style="min-width: 70px;">{{ lottery.useRange ? '數字範圍' : '名單模式' }}</span>
+        </div>
+
+        <div v-if="lottery.useRange" class="range-settings">
+          <span>範圍：</span>
+          <input type="number" v-model.number="lottery.rangeStart" class="draw-count-input">
+          <span> ~ </span>
+          <input type="number" v-model.number="lottery.rangeEnd" class="draw-count-input">
+          <span style="margin-left: 10px;">排除：</span>
+          <input type="text" v-model="lottery.excludeInput" class="range-exclude-input" placeholder="4, 17-20">
+          <button @click="resetLottery" class="pixel-btn mini" style="margin-left: 5px;">套用</button>
+        </div>
+
+        <div class="toggle-container">
           <span>人數：</span>
           <input type="number" v-model.number="lottery.drawCount" min="1" :max="lottery.pool.length || 1" class="draw-count-input">
           <span>排除重複中獎</span>
@@ -174,6 +224,9 @@ resetLottery();
 .winners-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%; }
 .winner-item { background: var(--fairy-blue-light); padding: 5px 15px; border-radius: 12px; font-size: 1.5rem; border: 1px solid white; animation: popIn 0.3s ease; color: var(--fairy-blue-dark); }
 @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.range-settings { display: flex; align-items: center; gap: 5px; font-size: 12px; background: rgba(255,255,255,0.5); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--fairy-blue-light); }
+.range-exclude-input { width: 100px; padding: 2px 8px; border-radius: 5px; border: 1px solid var(--fairy-blue-light); font-family: 'DotGothic16', sans-serif; font-size: 11px; outline: none; }
 
 /* 星芒噴發特效 */
 .celebration-overlay {
