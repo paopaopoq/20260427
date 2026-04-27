@@ -9,7 +9,7 @@ const tabs = [
     { id: 'exam', icon: '✎', name: '數位測驗' },
     { id: 'qa', icon: '★', name: '即時互動' },
     { id: 'lottery', icon: '⋆𐙚', name: '隨機抽籤' },
-    { id: 'score', icon: '⋆⁺₊', name: '競賽記分' },
+    { id: 'score', icon: '⋆⁺₊', name: '競賽計分' },
     { id: 'timer', icon: '❅', name: '報告計時' }
 ];
 const currentTab = ref('exam');

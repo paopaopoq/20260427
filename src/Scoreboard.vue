@@ -6,7 +6,7 @@ const teams = ref([
   { id: 2, name: 'Snow_Beta', score: 0 },
   { id: 3, name: 'Fairy_Gamma', score: 0 }
 ]);
-const activityName = ref('競賽記分板'); // 新增：活動名稱
+const activityName = ref('競賽計分板'); // 新增：活動名稱
 const isEditingActivityName = ref(false); // 新增：控制活動名稱編輯狀態
 
 const sortedTeams = computed(() => [...teams.value].sort((a, b) => b.score - a.score));
@@ -24,7 +24,7 @@ const saveActivityNameToLocal = () => {
 // 監聽 teams 變化，自動儲存
 watch(teams, saveTeamsToLocal, { deep: true });
 
-const addScore = (team, val) => { team.score += val; saveToLocal(); };
+const addScore = (team, val) => { team.score += val; };
 const addNewTeam = () => { teams.value.push({ id: Date.now(), name: '新組別', score: 0 }); }; // watch 會自動儲存
 const removeTeam = (id) => { teams.value = teams.value.filter(t => t.id !== id); }; // watch 會自動儲存
 const resetScores = () => { 
