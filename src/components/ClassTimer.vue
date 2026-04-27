@@ -5,6 +5,12 @@ const customMin = ref(5);
 const customSec = ref(0);
 
 const timer = reactive({ totalSeconds: 300, remainingSeconds: 300, isRunning: false, interval: null });
+
+// 音效初始化
+const alarmSound = new Audio('https://assets.mixkit.co/active_storage/sfx/1017/1017-preview.mp3');
+const tickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3'); // 緊張的滴答聲
+tickSound.volume = 0.5;
+
 const formattedTime = computed(() => {
   const m = Math.floor(timer.remainingSeconds / 60);
   const s = timer.remainingSeconds % 60;
@@ -16,10 +22,19 @@ const toggleTimer = () => {
   else {
     timer.isRunning = true;
     timer.interval = setInterval(() => {
-      if (timer.remainingSeconds > 0) timer.remainingSeconds--;
+      if (timer.remainingSeconds > 0) {
+        timer.remainingSeconds--;
+        // 最後 10 秒內播放滴答聲 (10, 9, ... 1)
+        if (timer.remainingSeconds <= 10 && timer.remainingSeconds > 0) {
+          tickSound.currentTime = 0;
+          tickSound.play().catch(() => {});
+        }
+      }
       else { 
         clearInterval(timer.interval); 
         timer.isRunning = false; 
+        // 時間到，播放鈴聲
+        alarmSound.play().catch(() => {});
       }
     }, 1000);
   }

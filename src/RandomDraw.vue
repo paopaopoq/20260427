@@ -16,6 +16,11 @@ const lottery = reactive({
 
 let rollInterval = null;
 
+// 音效初始化
+const rollSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+const winSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+rollSound.volume = 0.3;
+
 const resetLottery = () => {
   lottery.pool = lottery.rawInput.split('\n').map(s => s.trim()).filter(n => n);
   lottery.history = [];
@@ -36,6 +41,9 @@ const startLottery = () => {
   let count = 0;
   const totalRolls = 30;
   rollInterval = setInterval(() => {
+    // 播放滾動音效（重置進度以實現快速連續播放）
+    rollSound.currentTime = 0;
+    rollSound.play().catch(() => {});
     lottery.display = lottery.pool[Math.floor(Math.random() * lottery.pool.length)];
     if (++count > totalRolls) {
       clearInterval(rollInterval);
@@ -54,6 +62,8 @@ const startLottery = () => {
       }
       lottery.isRolling = false;
       lottery.isWinner = true;
+      // 播放中獎音效
+      winSound.play().catch(() => {});
     }
   }, 60);
 };
