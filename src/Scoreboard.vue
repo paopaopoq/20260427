@@ -1,37 +1,61 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 
 const teams = ref([
   { id: 1, name: 'Cyber_Alpha', score: 0 },
   { id: 2, name: 'Snow_Beta', score: 0 },
   { id: 3, name: 'Fairy_Gamma', score: 0 }
 ]);
+const activityName = ref('競賽記分板'); // 新增：活動名稱
+const isEditingActivityName = ref(false); // 新增：控制活動名稱編輯狀態
 
 const sortedTeams = computed(() => [...teams.value].sort((a, b) => b.score - a.score));
 
 const isResetting = ref(false);
 
-const saveToLocal = () => { localStorage.setItem('cyber_data', JSON.stringify(teams.value)); };
+const saveTeamsToLocal = () => {
+  localStorage.setItem('cyber_data_teams', JSON.stringify(teams.value));
+};
+
+const saveActivityNameToLocal = () => {
+  localStorage.setItem('cyber_data_activity_name', activityName.value);
+};
+
+// 監聽 teams 變化，自動儲存
+watch(teams, saveTeamsToLocal, { deep: true });
+
 const addScore = (team, val) => { team.score += val; saveToLocal(); };
-const addNewTeam = () => { teams.value.push({ id: Date.now(), name: 'New_Group', score: 0 }); saveToLocal(); };
-const removeTeam = (id) => { teams.value = teams.value.filter(t => t.id !== id); saveToLocal(); };
+const addNewTeam = () => { teams.value.push({ id: Date.now(), name: '新組別', score: 0 }); }; // watch 會自動儲存
+const removeTeam = (id) => { teams.value = teams.value.filter(t => t.id !== id); }; // watch 會自動儲存
 const resetScores = () => { 
   teams.value.forEach(t => t.score = 0); 
-  saveToLocal(); 
   isResetting.value = true;
   setTimeout(() => { isResetting.value = false; }, 500);
 };
 
 onMounted(() => {
-  const d = localStorage.getItem('cyber_data');
-  if (d) teams.value = JSON.parse(d);
+  // 載入隊伍資料
+  const savedTeams = localStorage.getItem('cyber_data_teams');
+  if (savedTeams) teams.value = JSON.parse(savedTeams);
+
+  // 載入活動名稱
+  const savedActivityName = localStorage.getItem('cyber_data_activity_name');
+  if (savedActivityName) activityName.value = savedActivityName;
 });
 </script>
 
 <template>
   <div class="cyber-window">
     <div class="window-header">
-      <span>❅.⋆𐙚 COMPETITION_BOARD.SYS</span>
+      <span v-if="!isEditingActivityName" @click="isEditingActivityName = true" class="activity-title-display">
+        ❅.⋆𐙚 {{ activityName }}
+      </span>
+      <input v-else
+             v-model="activityName"
+             @blur="isEditingActivityName = false; saveActivityNameToLocal()"
+             @keyup.enter="isEditingActivityName = false; saveActivityNameToLocal()"
+             class="activity-name-input"
+             maxlength="25">
       <button @click="resetScores" class="pixel-btn sm danger" style="padding: 2px 10px;">全部歸零</button>
     </div>
     <div class="window-content" :class="{ 'reset-flash': isResetting }">
@@ -42,10 +66,10 @@ onMounted(() => {
              :class="{ 'leader-row': index === 0 && team.score > 0 }">
           <div class="team-meta">
             <div class="rank-badge">{{ (index === 0 && team.score > 0) ? '👑' : index + 1 }}</div>
-            <input v-model="team.name" class="team-input" @change="saveToLocal">
+            <input v-model="team.name" class="team-input">
           </div>
           <div class="score-controls">
-            <input type="number" v-model.number="team.score" class="score-val-input" @change="saveToLocal">
+            <input type="number" v-model.number="team.score" class="score-val-input">
             <button @click="addScore(team, 1)" class="pixel-btn sm">+1</button>
             <button @click="addScore(team, 5)" class="pixel-btn sm">+5</button>
             <button @click="addScore(team, -1)" class="pixel-btn sm minus">-1</button>
