@@ -406,6 +406,11 @@ onUnmounted(() => {
 </template>
 
 <style>
+@font-face {
+    font-family: 'HYPixel';
+    src: url('./HYPixel11pxU-2.ttf') format('truetype');
+}
+
 :root {
     --fairy-blue: #a2cffe;
     --fairy-blue-light: #d6eaff;
@@ -471,7 +476,7 @@ body {
 .lace-bottom { bottom: 40px; transform: rotate(180deg); }
 
 header.main-header { text-align: center; margin-bottom: 25px; padding: 0 10px; position: relative; z-index: 10; }
-.main-header h1 { font-size: 36px; letter-spacing: 4px; color: var(--fairy-blue-dark); text-shadow: 2px 2px 0 white; }
+.main-header h1 { font-family: 'HYPixel', sans-serif; font-size: 48px; letter-spacing: 4px; color: var(--fairy-blue-dark); text-shadow: 2px 2px 0 white; }
 @media (max-width: 480px) { .main-header h1 { font-size: 28px; letter-spacing: 2px; } }
 
 .nav-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
