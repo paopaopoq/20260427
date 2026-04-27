@@ -206,10 +206,10 @@ resetLottery();
 .toggle-switch.on::after { left: 22px; }
 .draw-count-input { width: 50px; padding: 2px 5px; border-radius: 5px; border: 1px solid var(--fairy-blue-light); font-family: inherit; color: var(--pixel-blue); outline: none; }
 .btn-group { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-.pixel-btn { background: white; border: 2px solid var(--fairy-blue-dark); padding: 10px 24px; font-family: inherit; font-size: 13px; color: var(--pixel-blue); border-radius: 25px; box-shadow: 0 4px 0 var(--fairy-blue-light); cursor: pointer; }
+.pixel-btn { background: white; border: 2px solid var(--fairy-blue-dark); padding: 10px 24px; font-family: 'DotGothic16', sans-serif; font-size: 13px; color: var(--pixel-blue); border-radius: 25px; box-shadow: 0 4px 0 var(--fairy-blue-light); cursor: pointer; }
 .pixel-btn.primary { background: var(--fairy-blue-dark); color: white; border-color: white; }
 .edit-area { margin-top: 20px; width: 100%; }
-.raw-textarea { width: 100%; height: 120px; padding: 10px; border-radius: 15px; border: 1px solid var(--fairy-blue-light); resize: none; font-family: 'Space Mono'; }
+.raw-textarea { width: 100%; height: 120px; padding: 10px; border-radius: 15px; border: 1px solid var(--fairy-blue-light); resize: none; font-family: 'DotGothic16', sans-serif; }
 .w-full { width: 100%; justify-content: center; }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
