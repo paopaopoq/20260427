@@ -2,7 +2,7 @@
 import { ref, reactive, onUnmounted } from 'vue';
 
 const lottery = reactive({
-  rawInput: "學生 A\n學生 B\n學生 C\n第 1 組\n第 2 組\n第 3 組",
+  rawInput: "學生 A\n學生 B\n學生 C\n學生 D\n學生 E\n學生 F",
   pool: [],
   history: [],
   winners: [],
@@ -20,7 +20,7 @@ const lottery = reactive({
 
 let rollInterval = null;
 
-// 解析排除號碼字串 (例如 "4, 17-20")
+// 解析排除號碼字串 (例如 "")
 const parseExclusions = (input) => {
   const excluded = new Set();
   if (!input) return excluded;
@@ -154,7 +154,7 @@ resetLottery();
           <span> ~ </span>
           <input type="number" v-model.number="lottery.rangeEnd" class="draw-count-input">
           <span style="margin-left: 10px;">排除：</span>
-          <input type="text" v-model="lottery.excludeInput" class="range-exclude-input" placeholder="4, 17-20">
+          <input type="text" v-model="lottery.excludeInput" class="range-exclude-input" placeholder="">
           <button @click="resetLottery" class="pixel-btn mini" style="margin-left: 5px;">套用</button>
         </div>
 
