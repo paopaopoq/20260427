@@ -131,7 +131,7 @@ const pollTitle = ref('你最喜歡本系統的哪個功能？');
 const pollOptions = ref([
     { id: 1, text: '數位測驗系統', color: '#a2cffe' },
     { id: 2, text: '隨機抽籤機', color: '#74a9d8' },
-    { id: 3, text: '小組競賽記分', color: '#ffaaa5' },
+    { id: 3, text: '小組競賽計分', color: '#ffaaa5' },
     { id: 4, text: '報告計時器', color: '#a8e6cf' }
 ]);
 const pollResults = ref({ 1: 0, 2: 0, 3: 0, 4: 0 });
