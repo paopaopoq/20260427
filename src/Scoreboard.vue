@@ -13,6 +13,14 @@ const sortedTeams = computed(() => [...teams.value].sort((a, b) => b.score - a.s
 
 const isResetting = ref(false);
 
+// 音效初始化：加分時的輕快音效
+const scoreUpSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+scoreUpSound.volume = 0.5;
+
+// 音效初始化：減分時的失敗音效
+const scoreDownSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3');
+scoreDownSound.volume = 1.0;
+
 const saveTeamsToLocal = () => {
   localStorage.setItem('cyber_data_teams', JSON.stringify(teams.value));
 };
@@ -24,7 +32,17 @@ const saveActivityNameToLocal = () => {
 // 監聽 teams 變化，自動儲存
 watch(teams, saveTeamsToLocal, { deep: true });
 
-const addScore = (team, val) => { team.score += val; };
+const addScore = (team, val) => { 
+  team.score += val; 
+  // 只有在加分（val > 0）時播放音效
+  if (val > 0) {
+    scoreUpSound.currentTime = 0;
+    scoreUpSound.play().catch(() => {});
+  } else if (val < 0) {
+    scoreDownSound.currentTime = 0;
+    scoreDownSound.play().catch(() => {});
+  }
+};
 const addNewTeam = () => { teams.value.push({ id: Date.now(), name: '新組別', score: 0 }); }; // watch 會自動儲存
 const removeTeam = (id) => { teams.value = teams.value.filter(t => t.id !== id); }; // watch 會自動儲存
 const resetScores = () => { 

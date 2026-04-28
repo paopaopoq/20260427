@@ -225,6 +225,9 @@ onUnmounted(() => {
         </nav>
 
         <main class="cyber-window">
+            <!-- 視窗右上角裝飾 GIF -->
+            <img src="./bCwDZd.gif" class="window-mascot" alt="mascot">
+
             <div class="window-header">
                 <span v-if="currentTab !== 'qa'">{{ currentTab.toUpperCase() }}.EXE</span>
                 <span v-else>{{ pollMode === 'vote' ? 'POLL_VIEW.EXE' : 'POLL_CONFIG.EXE' }}</span>
@@ -247,7 +250,6 @@ onUnmounted(() => {
                     <div v-if="examMode === 'edit'">
                         <div style="display:flex; justify-content: space-between; margin-bottom: 15px; align-items: center;">
                             <h3>題目編輯器</h3>
-                            <button @click="addNewQuestion" class="pixel-btn primary mini">＋ 新增題目</button>
                         </div>
                         <div v-for="(q, index) in questions" :key="q.id" class="card-item">
                             <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
@@ -280,6 +282,7 @@ onUnmounted(() => {
 
                             <textarea v-model="q.explanation" class="edit-input" style="margin-top:10px; height:60px;" placeholder="輸入題目解析..."></textarea>
                         </div>
+                        <button @click="addNewQuestion" class="pixel-btn primary" style="width: 100%; justify-content: center; margin-top: 10px;">＋ 新增題目</button>
                     </div>
 
                     <!-- 測驗模式 (take) -->
@@ -487,8 +490,8 @@ header.main-header { text-align: center; margin-bottom: 25px; padding: 0 10px; p
 .tab-item.active { background: var(--fairy-blue-dark); color: white; transform: scale(1.05); }
 @media (max-width: 480px) { .tab-item { flex: 1 1 40%; font-size: 12px; padding: 8px 10px; } }
 
-.cyber-window { width: 95%; max-width: 750px; background: var(--glass-white); backdrop-filter: blur(10px); border: 2px solid white; border-radius: 24px; box-shadow: 0 20px 50px rgba(162, 207, 254, 0.15); overflow: hidden; margin-bottom: 20px; }
-.window-header { background: linear-gradient(90deg, var(--fairy-blue), var(--fairy-blue-light)); padding: 10px 20px; color: white; font-size: 11px; display: flex; justify-content: space-between; }
+.cyber-window { position: relative; width: 95%; max-width: 750px; background: var(--glass-white); backdrop-filter: blur(10px); border: 2px solid white; border-radius: 24px; box-shadow: 0 20px 50px rgba(162, 207, 254, 0.15); margin: 0 auto 20px; }
+.window-header { background: linear-gradient(90deg, var(--fairy-blue), var(--fairy-blue-light)); padding: 10px 20px; color: white; font-size: 11px; display: flex; justify-content: space-between; border-radius: 22px 22px 0 0; }
 .window-content { padding: 25px; max-height: 75vh; overflow-y: auto; }
 @media (max-width: 480px) { .window-content { padding: 15px 10px; } }
 
@@ -542,6 +545,11 @@ header.main-header { text-align: center; margin-bottom: 25px; padding: 0 10px; p
 .record-info { width: 100%; display: flex; justify-content: space-between; align-items: center; }
 .record-time { font-size: 11px; opacity: 0.6; }
 .record-score { font-weight: bold; color: var(--fairy-blue-dark); }
+
+.window-mascot { position: absolute; top: -65px; right: -10px; height: 90px; z-index: 1002; pointer-events: none; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1)); }
+@media (max-width: 480px) {
+    .window-mascot { height: 60px; top: -40px; right: -5px; }
+}
 
 .taskbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; background: rgba(255,255,255,0.8); border-top: 1px solid white; display: flex; align-items: center; padding: 0 20px; font-size: 11px; z-index: 2000; }
 .team-name-input { border: none; border-bottom: 2px solid transparent; font-family: inherit; font-size: 16px; font-weight: bold; color: var(--pixel-blue); padding: 4px; width: 60%; }

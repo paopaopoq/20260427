@@ -1,6 +1,9 @@
 <script setup>
 import { ref, reactive, onUnmounted } from 'vue';
 
+// 導入本地音效檔案，確保 Vite 在打包時能正確處理資源路徑
+import rollWav from './341984__unadamlar__winning.wav';
+
 const lottery = reactive({
   rawInput: "學生 A\n學生 B\n學生 C\n學生 D\n學生 E\n學生 F",
   pool: [],
@@ -41,9 +44,12 @@ const parseExclusions = (input) => {
 };
 
 // 音效初始化
-const rollSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
-const winSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
-rollSound.volume = 0.3;
+const rollSound = new Audio(rollWav); // 滾動音效
+const winSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3'); // 中獎音效
+const startDrawSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3'); // 開始抽籤音效
+rollSound.volume = 0.4;
+rollSound.loop = true; // 設定為循環播放，達到連續效果
+startDrawSound.volume = 0.5;
 
 const resetLottery = () => {
   if (lottery.useRange) {
@@ -72,15 +78,24 @@ const startLottery = () => {
   lottery.isRolling = true;
   lottery.isWinner = false;
   lottery.winners = [];
+
+  // 播放開始抽籤音效
+  startDrawSound.currentTime = 0;
+  startDrawSound.play().catch(() => {});
+  
+  // 開始播放連續滾動音效
+  rollSound.play().catch(() => {});
+
   let count = 0;
   const totalRolls = 30;
   rollInterval = setInterval(() => {
-    // 播放滾動音效（重置進度以實現快速連續播放）
-    rollSound.currentTime = 0;
-    rollSound.play().catch(() => {});
     lottery.display = lottery.pool[Math.floor(Math.random() * lottery.pool.length)];
     if (++count > totalRolls) {
       clearInterval(rollInterval);
+      
+      // 停止連續滾動音效
+      rollSound.pause();
+      rollSound.currentTime = 0;
       
       // 隨機選出指定人數
       const shuffled = [...lottery.pool].sort(() => 0.5 - Math.random());
@@ -189,7 +204,7 @@ resetLottery();
 </template>
 
 <style scoped>
-.cyber-window { background: var(--glass-white); backdrop-filter: blur(15px); border: 2px solid white; border-radius: 20px; box-shadow: 0 15px 45px rgba(162, 207, 254, 0.2); overflow: hidden; }
+.cyber-window { background: var(--glass-white); backdrop-filter: blur(15px); border: 2px solid white; border-radius: 20px; box-shadow: 0 15px 45px rgba(162, 207, 254, 0.2); overflow: hidden; margin: 0 auto; width: 100%; }
 .window-header { background: linear-gradient(90deg, var(--fairy-blue-dark), var(--fairy-blue)); padding: 12px 20px; color: white; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
 .win-dot { width: 8px; height: 8px; border-radius: 50%; background: white; opacity: 0.6; }
 .window-content { padding: 30px; }

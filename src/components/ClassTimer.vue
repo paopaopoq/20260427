@@ -1,15 +1,24 @@
 <script setup>
 import { ref, reactive, computed, onUnmounted } from 'vue';
 
+// 導入音效檔案，確保 Vite 在打包時能正確處理資源路徑
+import alarmMp3 from './501880__greenworm__cellphone-alarm-clock.mp3';
+import tickMp3 from './704134__entershift__beep-sound.mp3';
+
 const customMin = ref(5);
 const customSec = ref(0);
 
 const timer = reactive({ totalSeconds: 300, remainingSeconds: 300, isRunning: false, interval: null });
 
 // 音效初始化
-const alarmSound = new Audio('https://assets.mixkit.co/active_storage/sfx/1017/1017-preview.mp3');
-const tickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3'); // 緊張的滴答聲
+const alarmSound = new Audio(alarmMp3);
+const tickSound = new Audio(tickMp3); // 倒數每秒音效
 tickSound.volume = 0.5;
+
+const stopTickSound = () => {
+  tickSound.pause();
+  tickSound.currentTime = 0;
+};
 
 const formattedTime = computed(() => {
   const m = Math.floor(timer.remainingSeconds / 60);
@@ -18,23 +27,36 @@ const formattedTime = computed(() => {
 });
 const setTimer = (sec) => { timer.totalSeconds = sec; timer.remainingSeconds = sec; };
 const toggleTimer = () => {
-  if (timer.isRunning) { clearInterval(timer.interval); timer.isRunning = false; }
+  if (timer.isRunning) { 
+    clearInterval(timer.interval); 
+    timer.isRunning = false; 
+    stopTickSound(); // 暫停時停止音效
+  }
   else {
     timer.isRunning = true;
+    
+    // 在開始計時的瞬間立即檢查，確保 10 秒整時立即響一聲
+    if (timer.remainingSeconds <= 10 && timer.remainingSeconds > 0) {
+      tickSound.currentTime = 0;
+      tickSound.play().catch(() => {});
+    }
+
     timer.interval = setInterval(() => {
       if (timer.remainingSeconds > 0) {
         timer.remainingSeconds--;
-        // 最後 10 秒內播放滴答聲 (10, 9, ... 1)
-        if (timer.remainingSeconds <= 10 && timer.remainingSeconds > 0) {
+
+        if (timer.remainingSeconds === 0) {
+          // 剛好歸零，立即執行結束邏輯
+          clearInterval(timer.interval);
+          timer.isRunning = false;
+          stopTickSound();
+          alarmSound.currentTime = 0;
+          alarmSound.play().catch(() => {});
+        } else if (timer.remainingSeconds <= 10) {
+          // 還沒歸零但在 10 秒內，播放倒數滴答聲
           tickSound.currentTime = 0;
           tickSound.play().catch(() => {});
         }
-      }
-      else { 
-        clearInterval(timer.interval); 
-        timer.isRunning = false; 
-        // 時間到，播放鈴聲
-        alarmSound.play().catch(() => {});
       }
     }, 1000);
   }
@@ -42,14 +64,20 @@ const toggleTimer = () => {
 
 const applyCustomTimer = () => {
   const total = (customMin.value * 60) + (customSec.value || 0);
-  if (total > 0) setTimer(total);
+  if (total > 0) {
+    stopTickSound();
+    setTimer(total);
+  }
 };
 
-onUnmounted(() => clearInterval(timer.interval));
+onUnmounted(() => {
+  clearInterval(timer.interval);
+  stopTickSound();
+});
 </script>
 <template>
   <div class="cyber-window">
-    <div class="window-header"><span>❅.⋆𐙚 CLOCK_LOGIC.SEC</span></div>
+    <div class="window-header"><span>❅.⋆𐙚 TIMER</span></div>
     <div class="window-content">
       <div class="tool-panel">
         <div class="timer-display" :class="{ 
@@ -68,7 +96,7 @@ onUnmounted(() => clearInterval(timer.interval));
         </div>
         <div class="timer-actions">
           <button @click="toggleTimer" class="pixel-btn primary">{{ timer.isRunning ? '⏸ 暫停' : '▶ 開始' }}</button>
-          <button @click="timer.remainingSeconds = timer.totalSeconds" class="pixel-btn">⏹ 重置</button>
+          <button @click="timer.remainingSeconds = timer.totalSeconds; stopTickSound();" class="pixel-btn">⏹ 重置</button>
         </div>
       </div>
     </div>
