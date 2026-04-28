@@ -32,9 +32,11 @@ const saveActivityNameToLocal = () => {
 // 監聽 teams 變化，自動儲存
 watch(teams, saveTeamsToLocal, { deep: true });
 
-const addScore = (team, val) => { 
-  team.score += val; 
-  // 只有在加分（val > 0）時播放音效
+const addScore = (team, val) => {
+  // 確保數值有效
+  const currentScore = Number(team.score) || 0;
+  team.score = currentScore + val;
+
   if (val > 0) {
     scoreUpSound.currentTime = 0;
     scoreUpSound.play().catch(() => {});
@@ -81,9 +83,9 @@ onMounted(() => {
         <div v-for="(team, index) in sortedTeams" 
              :key="team.id" 
              class="score-row"
-             :class="{ 'leader-row': index === 0 && team.score > 0 }">
+             :class="{ 'leader-row': team.score === sortedTeams[0].score && team.score > 0 }">
           <div class="team-meta">
-            <div class="rank-badge">{{ (index === 0 && team.score > 0) ? '👑' : index + 1 }}</div>
+            <div class="rank-badge">{{ (team.score === sortedTeams[0].score && team.score > 0) ? '👑' : index + 1 }}</div>
             <input v-model="team.name" class="team-input">
           </div>
           <div class="score-controls">
@@ -149,7 +151,7 @@ onMounted(() => {
 .score-val { font-size: 24px; font-weight: bold; width: 60px; text-align: center; color: var(--fairy-blue-dark); }
 .pixel-btn { background: white; border: 2px solid var(--fairy-blue-dark); padding: 5px 12px; color: var(--pixel-blue); border-radius: 20px; cursor: pointer; }
 .pixel-btn.sm { font-size: 11px; }
-.minus { opacity: 0.6; }
+.minus { opacity: 0.8; }
 .pixel-btn.danger { border-color: #ffaaa5; color: #ffaaa5; }
 .w-full { width: 100%; justify-content: center; display: flex; margin-top: 15px; }
 
